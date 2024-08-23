@@ -1,0 +1,59 @@
+name: iOS Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+
+
+concurrency:
+  group: 'build-and-deploy'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.3
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - run: npm ci
+    - run: npm test
+    #- run: brew install cocoapods
+
+    - name: Install Bundler
+      run: gem install bundler
+
+    - name: Install Ruby gems
+      run: bundle install
+      working-directory: ios
+       
+    - name: Install NPM dependencies
+      run: npm install
+
+    - name: Install CocoaPods dependencies
+      run: bundle exec pod install
+      working-directory: ios
+
+
+#    - name: Build iOS app
+#      run: bundle exec fastlane ios build
+#      working-directory: ios
+#
+#    - name: Deploy to TestFlight
+#      run: bundle exec fastlane ios build
+#      #working-directory: ios
+#      #env:
+#      #  APPLE_ID: ${{ secrets.APPLE_ID }}
+#      #  FASTLANE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+#      #  MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
