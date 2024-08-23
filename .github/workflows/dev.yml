@@ -42,7 +42,7 @@ jobs:
       run: npm install
 
     - name: Install CocoaPods dependencies
-      run: bundle exec pod install
+      run: pod install
       working-directory: ios
 
 
